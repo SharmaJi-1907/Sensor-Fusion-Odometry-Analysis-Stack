@@ -1,0 +1,371 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="robu">
+
+    <!-- Dimensions -->
+    <xacro:property name="base_x" value="0.45" />
+    <xacro:property name="base_y" value="0.40" />
+    <xacro:property name="base_z" value="0.03" />
+
+    <xacro:property name="pillar_x" value="0.03" />
+    <xacro:property name="pillar_y" value="0.03" />
+    <xacro:property name="pillar_z" value="0.26" />
+    <xacro:property name="pillar_origin_x" value="${(base_x/2)-(pillar_x/2)}" />
+    <xacro:property name="pillar_origin_y" value="${(base_y/2)-(0.02+(pillar_y/2))}" />
+    <xacro:property name="pillar_origin_z" value="${(pillar_z/2)+(base_z/2)}" />
+
+    <xacro:property name="plf_x" value="0.45" />
+    <xacro:property name="plf_y" value="0.30" />
+    <xacro:property name="plf_z" value="0.005" />
+    <xacro:property name="plf1_origin_z" value="${(base_z/2)+(plf_z/2)+0.07}" />
+    <xacro:property name="plf2_origin_z" value="${(base_z/2)+(plf_z/2)+0.19}" />
+
+    <xacro:property name="camera_base_x" value="0.04" />
+    <xacro:property name="camera_base_y" value="0.016" />
+    <xacro:property name="camera_base_z" value="0.026" />
+    <xacro:property name="camera_origin_x" value="${(base_x/2)-(camera_base_x/2)}" />
+    <xacro:property name="camera_origin_z" value="${(plf_z/2)+(camera_base_z/2)}" />
+
+    <xacro:property name="motor_x" value="0.06" />
+    <xacro:property name="motor_y" value="0.165" />
+    <xacro:property name="motor_z" value="0.065" />
+    <xacro:property name="motor_r" value="0.032" />
+    <xacro:property name="motor_l" value="0.165" />
+
+    <xacro:property name="m_wheel_r" value="0.01" />
+    <xacro:property name="m_wheel_l" value="0.01" />
+    <xacro:property name="m_wheel_origin_y" value="${(motor_l/2)+(m_wheel_l/2)}" />
+
+    <xacro:property name="wheel_r" value="0.049" />
+    <xacro:property name="wheel_l" value="0.03" />
+    <xacro:property name="wheel_origin_y" value="${(m_wheel_l/2)+(wheel_l/2)}" />
+
+    <xacro:property name="caster_r" value="${(wheel_r+motor_r)/2}" />
+    <xacro:property name="caster_l" value="0.02" />
+    <xacro:property name="caster_origin_x" value="${(base_x/2)-(caster_r)}" />
+    <xacro:property name="caster_origin_z" value="${(base_z/2)+(caster_r)}" />
+
+    <!-- Base and frames -->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${base_x} ${base_y} ${base_z}" />
+            </geometry>
+        </visual>
+    </link>
+
+    <link name="base_footprint" />
+
+    <joint name="base_footprint_to_base" type="fixed">
+        <parent link="base_footprint" />
+        <child link="base_link" />
+        <origin xyz="0 0 ${((base_z/2)+(2*caster_r))}" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <link name="imu_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.03 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <joint name="imu_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.025" rpy="0.0 0.0 0.0" />
+        <parent link="base_link" />
+        <child link="imu_link" />
+    </joint>
+
+    <link name="odom" />
+    <joint name="odom_to_base_footprint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+        <parent link="odom" />
+        <child link="base_footprint" />
+    </joint>
+
+    <!-- PILLARS -->
+    <link name="pillar_fr_link">
+        <visual>
+            <geometry>
+                <box size="${pillar_x} ${pillar_y} ${pillar_z}" />
+            </geometry>
+            <material name="pillar_mat_fr">
+                <color rgba="1.0 1.0 1.0 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="base_to_pillar_fr" type="fixed">
+        <parent link="base_link" />
+        <child link="pillar_fr_link" />
+        <origin xyz="${pillar_origin_x} ${-pillar_origin_y} ${pillar_origin_z}" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <link name="pillar_fl_link">
+        <visual>
+            <geometry>
+                <box size="${pillar_x} ${pillar_y} ${pillar_z}" />
+            </geometry>
+            <material name="pillar_mat_fl">
+                <color rgba="1.0 1.0 1.0 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="base_to_pillar_fl" type="fixed">
+        <parent link="base_link" />
+        <child link="pillar_fl_link" />
+        <origin xyz="${pillar_origin_x} ${pillar_origin_y} ${pillar_origin_z}" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <link name="pillar_br_link">
+        <visual>
+            <geometry>
+                <box size="${pillar_x} ${pillar_y} ${pillar_z}" />
+            </geometry>
+            <material name="pillar_mat_br">
+                <color rgba="1.0 1.0 1.0 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="base_to_pillar_br" type="fixed">
+        <parent link="base_link" />
+        <child link="pillar_br_link" />
+        <origin xyz="${-pillar_origin_x} ${-pillar_origin_y} ${pillar_origin_z}" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <link name="pillar_bl_link">
+        <visual>
+            <geometry>
+                <box size="${pillar_x} ${pillar_y} ${pillar_z}" />
+            </geometry>
+            <material name="pillar_mat_bl">
+                <color rgba="1.0 1.0 1.0 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="base_to_pillar_bl" type="fixed">
+        <parent link="base_link" />
+        <child link="pillar_bl_link" />
+        <origin xyz="${-pillar_origin_x} ${pillar_origin_y} ${pillar_origin_z}" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <!-- PLATFORMS -->
+    <link name="plf_1_link">
+        <visual>
+            <geometry>
+                <box size="${plf_x} ${plf_y} ${plf_z}" />
+            </geometry>
+        </visual>
+    </link>
+    <joint name="base_to_plf_1" type="fixed">
+        <parent link="base_link" />
+        <child link="plf_1_link" />
+        <origin xyz="0.0 0.0 ${plf1_origin_z}" rpy="0.0 0.0 0.0" />
+        <axis xyz="1.0 0.0 0.0" />
+    </joint>
+
+    <link name="plf_2_link">
+        <visual>
+            <geometry>
+                <box size="${plf_x} ${plf_y} ${plf_z}" />
+            </geometry>
+        </visual>
+    </link>
+    <joint name="base_to_plf_2" type="fixed">
+        <parent link="base_link" />
+        <child link="plf_2_link" />
+        <origin xyz="0.0 0.0 ${plf2_origin_z}" rpy="0.0 0.0 0.0" />
+        <axis xyz="1.0 0.0 0.0" />
+    </joint>
+
+    <!-- CAMERA -->
+    <link name="my_camera_base_link">
+        <visual>
+            <geometry>
+                <box size="${camera_base_x} ${camera_base_y} ${camera_base_z}" />
+            </geometry>
+            <material name="camera_base_mat">
+                <color rgba="0.0 0.0 0.0 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="base_to_camera_base" type="fixed">
+        <parent link="plf_2_link" />
+        <child link="my_camera_base_link" />
+        <origin xyz="${camera_origin_x} 0.0 ${camera_origin_z}" rpy="0.0 0.0 0.0" />
+        <axis xyz="1.0 0.0 0.0" />
+    </joint>
+
+    <link name="camera_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <box size="0.036 0.18 0.025" />
+            </geometry>
+            <material name="camera_mat">
+                <color rgba="0.0 0.0 0.0 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="camera_base_to_camera" type="fixed">
+        <parent link="my_camera_base_link" />
+        <child link="camera_link" />
+        <origin xyz="0.0 0.0 0.0225" rpy="0.0 0.0 0.0" />
+        <axis xyz="1.0 0.0 0.0" />
+    </joint>
+
+    <!-- MOTORS -->
+    <link name="motor_1_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0" />
+            <geometry>
+                <cylinder radius="${motor_r}" length="${motor_l}" />
+            </geometry>
+            <material name="motor_mat_1">
+                <color rgba="0.8 0.8 0.8 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="base_to_motor_1" type="fixed">
+        <parent link="base_link" />
+        <child link="motor_1_link" />
+        <origin xyz="${base_x/2-motor_x/2} ${-(base_y/2-motor_y/2)} ${-(base_z/2+motor_z/2)}" rpy="0.0 0.0 0.0" />
+        <axis xyz="1.0 0.0 0.0" />
+    </joint>
+
+    <link name="motor_2_link">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0" />
+            <geometry>
+                <cylinder radius="${motor_r}" length="${motor_l}" />
+            </geometry>
+            <material name="motor_mat_2">
+                <color rgba="0.8 0.8 0.8 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="base_to_motor_2" type="fixed">
+        <parent link="base_link" />
+        <child link="motor_2_link" />
+        <origin xyz="${base_x/2-motor_x/2} ${(base_y/2-motor_y/2)} ${-(base_z/2+motor_z/2)}" rpy="0.0 0.0 0.0" />
+        <axis xyz="1.0 0.0 0.0" />
+    </joint>
+
+    <!-- MOTOR WHEEL LINKS -->
+    <link name="right_m_wheel_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${m_wheel_r}" length="${m_wheel_l}" />
+            </geometry>
+            <material name="m_wheel_right_mat">
+                <color rgba="0.2 0.2 0.2 1.0" />
+            </material>
+            <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0" />
+        </visual>
+    </link>
+    <joint name="base_to_right_m_wheel" type="fixed">
+        <parent link="motor_1_link" />
+        <child link="right_m_wheel_link" />
+        <origin xyz="0.0 ${-m_wheel_origin_y} 0.0" rpy="0.0 0.0 0.0" />
+        <axis xyz="0.0 1.0 0.0" />
+    </joint>
+
+    <link name="left_m_wheel_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${m_wheel_r}" length="${m_wheel_l}" />
+            </geometry>
+            <material name="m_wheel_left_mat">
+                <color rgba="0.2 0.2 0.2 1.0" />
+            </material>
+            <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0" />
+        </visual>
+    </link>
+    <joint name="base_to_left_m_wheel" type="fixed">
+        <parent link="motor_2_link" />
+        <child link="left_m_wheel_link" />
+        <origin xyz="0.0 ${m_wheel_origin_y} 0.0" rpy="0.0 0.0 0.0" />
+        <axis xyz="0.0 1.0 0.0" />
+    </joint>
+
+    <!-- WHEELS -->
+    <link name="right_wheel_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_r}" length="${wheel_l}" />
+            </geometry>
+            <material name="wheel_right_mat">
+                <color rgba="0.2 0.2 0.2 1.0" />
+            </material>
+            <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0" />
+        </visual>
+    </link>
+    <joint name="base_to_right_wheel" type="continuous">
+        <parent link="right_m_wheel_link" />
+        <child link="right_wheel_link" />
+        <origin xyz="0.0 ${-wheel_origin_y} 0.0" rpy="0.0 0.0 0.0" />
+        <axis xyz="0.0 1.0 0.0" />
+    </joint>
+
+    <link name="left_wheel_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_r}" length="${wheel_l}" />
+            </geometry>
+            <material name="wheel_left_mat">
+                <color rgba="0.2 0.2 0.2 1.0" />
+            </material>
+            <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0" />
+        </visual>
+    </link>
+    <joint name="base_to_left_wheel" type="continuous">
+        <parent link="left_m_wheel_link" />
+        <child link="left_wheel_link" />
+        <origin xyz="0.0 ${wheel_origin_y} 0.0" rpy="0.0 0.0 0.0" />
+        <axis xyz="0.0 1.0 0.0" />
+    </joint>
+
+    <!-- CASTER -->
+    <link name="casster_wheel_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${caster_r}" length="${caster_l}" />
+            </geometry>
+            <material name="caster_mat">
+                <color rgba="0.2 0.2 0.2 1.0" />
+            </material>
+            <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0" />
+        </visual>
+    </link>
+    <joint name="base_to_casster_wheel" type="fixed">
+        <parent link="base_link" />
+        <child link="casster_wheel_link" />
+        <origin xyz="${-caster_origin_x} 0.0 ${-caster_origin_z}" rpy="0.0 0.0 0.0" />
+        <axis xyz="0.0 1.0 0.0" />
+    </joint>
+
+    <!-- ros2_control configuration using nandi_controller hardware plugin -->
+    <ros2_control name="nandi_system" type="system">
+        <hardware>
+            <plugin>nandi_controller/NandiHardwareSystem</plugin>
+            <param name="right_encoder_topic">right_encoder_counts</param>
+            <param name="left_encoder_topic">left_encoder_counts</param>
+            <param name="right_motor_topic">right_motor_speed_cmd</param>
+            <param name="left_motor_topic">left_motor_speed_cmd</param>
+            <param name="ticks_per_rev">4000</param>
+            <param name="gear_ratio">35</param>
+            <param name="encoder_on_motor_shaft">true</param>
+            <param name="right_encoder_sign">-1</param>
+            <param name="left_encoder_sign">-1</param>
+        </hardware>
+
+        <joint name="base_to_left_wheel">
+            <command_interface name="velocity" />
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="base_to_right_wheel">
+            <command_interface name="velocity" />
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+    </ros2_control>
+
+</robot>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<library path="nandi_hardware">
+    <class
+        name="nandi_controller/NandiHardwareSystem"
+        type="nandi_controller::NandiHardwareSystem"
+        base_class_type="hardware_interface::SystemInterface">
+        <description>Hardware plugin for Nandi diff-drive (two velocity-controlled wheel joints).</description>
+    </class>
+
+</library>

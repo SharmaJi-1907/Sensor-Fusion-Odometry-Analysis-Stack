@@ -1,0 +1,12 @@
+pose_logger_node:
+  ros__parameters:
+    # Topics
+    wheel_odom_topic: "/mobile_base_controller/odom"
+    filtered_odom_topic: "/odometry/filtered"
+    
+    # Storage Location
+    log_dir: "/home/abhinav/Trajectory_tracking/4_bot_with_imu/src/pose_logger_pkg/path"
+    
+    # Recording Thresholds
+    min_dist_threshold: 0.10   # 10 cm
+    min_angle_threshold: 0.4   # 0.4 radians
